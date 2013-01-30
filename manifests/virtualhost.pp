@@ -1,5 +1,8 @@
 # = Define: apache::virtualhost
 #
+# NOTE: This define does the same function of apache::vhost and is
+#       now deprecated. Use apache::vhost instead.
+#
 # Basic Virtual host management define
 # You can use different templates for your apache virtual host files
 # Default is virtualhost.conf.erb, adapt it to your needs or create
@@ -30,6 +33,7 @@ define apache::virtualhost (
   $create_docroot = true ,
   $enable         = true ,
   $owner          = '' ,
+  $content        = '' ,
   $groupowner     = '' ) {
 
   include apache
@@ -66,10 +70,15 @@ define apache::virtualhost (
   $ensure = bool2ensure($enable)
   $bool_create_docroot = any2bool($create_docroot)
 
+  $real_content = $content ? {
+    ''      => template("${templatepath}/${templatefile}"),
+    default => $content,
+  }
+
   file { "ApacheVirtualHost_$name":
     ensure  => $ensure,
     path    => $real_path,
-    content => template("${templatepath}/${templatefile}"),
+    content => $real_content,
     mode    => $apache::config_file_mode,
     owner   => $apache::config_file_owner,
     group   => $apache::config_file_group,
