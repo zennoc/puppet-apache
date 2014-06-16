@@ -1,6 +1,6 @@
 # File Managed by Puppet
 
-<VirtualHost *:<%= @port %>>
+<VirtualHost <%= @ip_addr %>:<%= @port %>>
     ServerAdmin <%= @server_admin_email ||= 'webmaster@localhost' %>
     DocumentRoot <%= @real_docroot %>
 <% if @server_name_value != false -%>
@@ -13,9 +13,9 @@
     ServerAlias <%= @serveraliases %>
 <% end -%>
 <% end -%>
-<% if env_variables != "" -%>
-<% if env_variables.is_a? Array -%>
-<% env_variables.each do |envvars| -%>
+<% if @env_variables != "" -%>
+<% if @env_variables.is_a? Array -%>
+<% @env_variables.each do |envvars| -%>
     SetEnv <%= envvars %>
 <% end -%>
 <% end -%>
@@ -39,20 +39,23 @@
     <% if @passenger_rack_base_uri != ''  %>RackBaseURI <%= @passenger_rack_base_uri %><% end %>
 
 <% end -%>
-<% if @directory_options != "" || @directory_allow_override != "None" -%>
+<% if @directory_options != "" || @directory_allow_override != "None" || @directory_require != "" -%>
     <Directory <%= @real_directory %>>
-        <% if @directory_options != "" -%>
+<% if @directory_options != "" -%>
         Options <%= @directory_options %>
-        <% end -%>
-        <% if @directory_allow_override != "None" -%>
+<% end -%>
+<% if @directory_allow_override != "None" -%>
         AllowOverride <%= @directory_allow_override %>
-        <% end -%>
+<% end -%>
+<% if @directory_require != "" -%>
+        Require <%= @directory_require %>
+<% end -%>
     </Directory>
 <% end -%>
 
 <% if @aliases != "" -%>
 <% if @aliases.is_a? Array -%>
-<% aliases.each do |singlealias| %>
+<% @aliases.each do |singlealias| %>
     Alias <%= singlealias %>
 <% end -%>
 <% else -%>

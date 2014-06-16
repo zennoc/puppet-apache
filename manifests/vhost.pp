@@ -5,6 +5,9 @@
 # == Parameters:
 # [*port*]
 #   The port to configure the host on
+
+# [*ip_addr*]
+#   The ip to configure the host on. Default: * (all IPs)
 #
 # [*docroot*]
 #   The VirtualHost DocumentRoot
@@ -88,6 +91,9 @@
 # [*directory_allow_override*]
 #   Set the directory's override configuration
 #
+# [*directory_require*]
+#   Set the Require attribute for Apache 2.4
+#
 # [*aliases*]
 #   Set one or more Alias directives (e.g '/phpmyadmin /usr/share/phpMyAdmin'
 #   or ['/alias1 /path/to/alias', '/alias2 /path/to/secondalias'])
@@ -121,6 +127,7 @@ define apache::vhost (
   $docroot_owner                = 'root',
   $docroot_group                = 'root',
   $port                         = '80',
+  $ip_addr                      = '*',
   $ssl                          = false,
   $template                     = 'apache/virtualhost/vhost.conf.erb',
   $source                       = '',
@@ -143,6 +150,7 @@ define apache::vhost (
   $directory                    = '',
   $directory_options            = '',
   $directory_allow_override     = 'None',
+  $directory_require            = '',
   $aliases                      = ''
 ) {
 
@@ -235,6 +243,7 @@ define apache::vhost (
         ensure  => $file_vhost_link_ensure,
         path    => $config_file_enable_path,
         require => Package['apache'],
+        notify  => $apache::manage_service_autorestart,
       }
     }
     redhat,centos,scientific,fedora: {
